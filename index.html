@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="준우갤러그" />
+  <meta name="theme-color" content="#040613" />
+  <title>🚀 전준우의 갤러그 (CAPTAIN JUNWOO GALAGA)</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23040613'/><polygon points='50,12 62,46 86,58 65,66 68,86 50,74 32,86 35,66 14,58 38,46' fill='%2300f2fe'/></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 상단 헤더 바 -->
+  <header class="app-header">
+    <div class="brand-wrap">
+      <div class="brand-badge">🚀 JW-01</div>
+      <div class="brand-text">
+        <h1>CAPTAIN 전준우 <span>GALAGA</span></h1>
+        <p class="sub-headline">아빠가 준우를 위해 만든 우주 함대 아케이드 슈팅 게임</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button id="btnCheerTrigger" class="hdr-btn cheer-btn" title="준우 응원 사운드 발사!">
+        📣 준우 응원!
+      </button>
+      <button id="btnOpenTutorial" class="hdr-btn tutorial-btn" title="사용법 튜토리얼 보기">
+        ❓ 사용법
+      </button>
+      <button id="btnOpenSync" class="hdr-btn sync-btn" title="클라우드 랭킹 동기화 설정">
+        <span id="syncDot" class="sync-dot"></span>
+        <span id="syncStatusText">클라우드 동기화</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 메인 게임 & 사이드 대시보드 레이아웃 -->
+  <main class="main-container">
+    <!-- 좌측/중앙: 아케이드 캐비닛 화면 -->
+    <section class="arcade-column">
+      <!-- 상단 사운드 & 옵션 퀵 바 -->
+      <div class="quick-control-bar">
+        <button id="btnToggleSfx" class="chip-btn active" title="8비트 효과음 켜기/끄기">🔊 효과음 ON</button>
+        <button id="btnToggleBgm" class="chip-btn active" title="준우의 우주 출격 BGM 켜기/끄기">🎵 준우 BGM ON</button>
+        <button id="btnToggleVoice" class="chip-btn active" title="사령부 전준우 음성 응원 켜기/끄기">🎙️ 준우 음성응원 ON</button>
+        <button id="btnToggleAutoFire" class="chip-btn active" title="자동 연사 켜기/끄기">🔥 자동연사 ON</button>
+        <button id="btnPauseGame" class="chip-btn" title="일시정지 (P)">⏸️ 일시정지</button>
+      </div>
+
+      <!-- 아케이드 전광판 (1UP / HIGH SCORE / STAGE) -->
+      <div class="arcade-scoreboard">
+        <div class="score-box">
+          <span class="score-label one-up">1UP (전준우)</span>
+          <span id="txtCurrentScore" class="score-value">00</span>
+        </div>
+        <div class="score-box center">
+          <span class="score-label high-score">HIGH SCORE</span>
+          <span id="txtHighScore" class="score-value highlight">20000</span>
+        </div>
+        <div class="score-box right">
+          <span class="score-label stage-lbl">STAGE</span>
+          <span id="txtStageNum" class="score-value">1</span>
+        </div>
+      </div>
+
+      <!-- 게임 캔버스 래퍼 -->
+      <div class="canvas-wrapper" id="canvasWrapper">
+        <canvas id="gameCanvas" width="440" height="560"></canvas>
+
+        <!-- 실시간 응원 홀로그램 토스트 -->
+        <div id="cheerBanner" class="cheer-banner hidden">
+          <span id="cheerBannerText">★ CAPTAIN 전준우 출격! ★</span>
+        </div>
+
+        <!-- 시작 / 게임오버 / 일시정지 오버레이 -->
+        <div id="gameOverlay" class="game-overlay">
+          <div class="overlay-card">
+            <div class="retro-crown">👑 SPECIAL EDITION FOR JUNWOO 👑</div>
+            <h2 id="overlayTitle" class="overlay-title">JUNWOO GALAGA</h2>
+            <p id="overlaySubtitle" class="overlay-subtitle">
+              우주 최강 에이스 파일럿 <strong>전준우 함장님</strong>!<br />
+              외계 갤러그 편대를 물리치고 은하계를 지켜주세요!
+            </p>
+
+            <!-- 점수 안내 미니 테이블 -->
+            <div class="enemy-guide-grid" id="overlayGuideGrid">
+              <div class="enemy-guide-item">
+                <span class="enemy-icon boss-icon">🛸</span>
+                <div>
+                  <strong>보스 갤러그</strong>
+                  <small>대열 150점 / 급강하 400~1600점<br/><em>트랙터 빔 구출 시 2대 합체!</em></small>
+                </div>
+              </div>
+              <div class="enemy-guide-item">
+                <span class="enemy-icon goei-icon">🦋</span>
+                <div>
+                  <strong>고에이 (붉은 나비)</strong>
+                  <small>대열 80점 / 급강하 160점</small>
+                </div>
+              </div>
+              <div class="enemy-guide-item">
+                <span class="enemy-icon zako-icon">🐝</span>
+                <div>
+                  <strong>자코 (노란 벌)</strong>
+                  <small>대열 50점 / 급강하 100점</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- 게임오버 결과 리포트 (게임오버 시 표시) -->
+            <div id="gameOverStats" class="gameover-stats hidden">
+              <div class="stat-row"><span>최종 점수</span><strong id="statFinalScore">0</strong></div>
+              <div class="stat-row"><span>도달 스테이지</span><strong id="statFinalStage">STAGE 1</strong></div>
+              <div class="stat-row"><span>발사한 미사일</span><strong id="statShotsFired">0발</strong></div>
+              <div class="stat-row"><span>격추한 적기</span><strong id="statHitsCount">0기</strong></div>
+              <div class="stat-row highlight"><span>명중률 (HIT RATIO)</span><strong id="statHitRatio">0.0%</strong></div>
+            </div>
+
+            <!-- 플레이어 이름 & 기체 선택 -->
+            <div class="pilot-select-row">
+              <label for="pilotNameInput">파일럿 이름:</label>
+              <input type="text" id="pilotNameInput" value="전준우" maxlength="10" placeholder="전준우" />
+              <select id="shipSkinSelect" title="준우 전용 기체 색상 선택">
+                <option value="junwoo_gold">✨ 준우 골드 스타파이터</option>
+                <option value="classic_white">🚀 오리지널 화이트&레드</option>
+                <option value="cyber_cyan">⚡ 사이버 네온 블루</option>
+              </select>
+            </div>
+
+            <div class="difficulty-select-row">
+              <span class="diff-label">난이도 모드:</span>
+              <button type="button" class="diff-btn active" data-diff="junwoo">🌟 준우 영웅 모드 (목숨 5개·합체 쉬움)</button>
+              <button type="button" class="diff-btn" data-diff="normal">🕹️ 오리지널 아케이드 (목숨 3개)</button>
+            </div>
+
+            <button id="btnStartGame" class="start-game-btn">
+              🚀 전준우 함대 출격 시작! (START)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 모바일/태블릿 전용 하단 터치 컨트롤 패드 -->
+      <div class="mobile-controls" id="mobileControls">
+        <div class="dpad-group">
+          <button id="btnTouchLeft" class="touch-btn dir-btn" aria-label="왼쪽 이동">◀</button>
+          <button id="btnTouchRight" class="touch-btn dir-btn" aria-label="오른쪽 이동">▶</button>
+        </div>
+
+        <div class="touch-center-info">
+          <div class="drag-pad" id="touchDragZone">
+            <span>👆 좌우로 드래그해서 조종</span>
+          </div>
+        </div>
+
+        <div class="action-group">
+          <button id="btnTouchSpecial" class="touch-btn special-btn" title="준우 보호막/응원포 (스테이지당 1회)">⚡준우포</button>
+          <button id="btnTouchFire" class="touch-btn fire-btn" aria-label="미사일 발사">🔥 발사</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 우측(모바일 하단): 명예의 전당 랭킹 & 준우 전용 미션 보드 -->
+    <aside class="dashboard-column">
+      <!-- 준우 함장 전용 상태 카드 -->
+      <div class="panel-card junwoo-commander-card">
+        <div class="card-header">
+          <h3>👨‍🚀 전준우 함장님 전용 콘솔</h3>
+          <span class="badge-live">JUNWOO EDITION</span>
+        </div>
+        <p class="commander-desc">
+          배경의 <strong>전준우 은하 성단</strong>과 출격 팡파르가 준우의 승리를 응원합니다!
+        </p>
+
+        <div class="special-controls-grid">
+          <div class="control-item">
+            <label for="bgThemeSelect">🌌 우주 배경 테마</label>
+            <select id="bgThemeSelect">
+              <option value="junwoo_galaxy">🌟 전준우 네온 은하계 (기본)</option>
+              <option value="supernova">🔥 슈퍼노바 불꽃 성운</option>
+              <option value="classic_arcade">🕹️ 1981 오리지널 블랙</option>
+            </select>
+          </div>
+          <div class="control-item">
+            <label for="customCheerInput">💬 배경 응원 문구 변경</label>
+            <div class="inline-input-group">
+              <input type="text" id="customCheerInput" value="우주 최강 전준우 화이팅! 사랑해 아들!" maxlength="30" />
+              <button id="btnSaveCheerMsg" class="mini-btn">적용</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="shortcut-tips">
+          <span>⌨️ <strong>PC 조작:</strong> <code>←</code> <code>→</code> 이동 | <code>Space</code> 발사 | <code>X</code> 준우 필살기 스타버스트 | <code>P</code> 일시정지</span>
+        </div>
+      </div>
+
+      <!-- 명예의 전당 (실시간 클라우드 동기화 Top 10) -->
+      <div class="panel-card leaderboard-card">
+        <div class="card-header">
+          <h3>🏆 갤러그 명예의 전당 (TOP 10)</h3>
+          <button id="btnRefreshRank" class="icon-btn" title="랭킹 새로고침">🔄</button>
+        </div>
+        <div id="leaderboardList" class="leaderboard-list">
+          <!-- JS로 렌더링 -->
+        </div>
+      </div>
+
+      <!-- 전준우 함장 업적 배지 -->
+      <div class="panel-card badges-card">
+        <div class="card-header">
+          <h3>🎖️ 전준우 파일럿 훈장</h3>
+          <span id="badgeProgressText" class="badge-count">0 / 6 달성</span>
+        </div>
+        <div id="achievementsGrid" class="achievements-grid">
+          <!-- JS로 렌더링 -->
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ==================== 5단계 사용법 튜토리얼 모달 ==================== -->
+  <div id="tutorialModal" class="modal-backdrop">
+    <div class="modal-box tutorial-box">
+      <div class="modal-header">
+        <h2>🕹️ 전준우의 갤러그 완벽 가이드</h2>
+        <button id="btnCloseTutorialModal" class="close-btn">&times;</button>
+      </div>
+
+      <div class="tutorial-body">
+        <!-- Slide 1 -->
+        <div class="tutorial-slide active" data-slide="0">
+          <div class="tut-badge">STEP 1 / 5</div>
+          <h3>🚀 전준우 함장님을 위한 스페셜 갤러그!</h3>
+          <p>
+            1981년 오리지널 아케이드 명작 <strong>갤러그(Galaga)</strong>를 전준우 함장님만을 위한 특별판으로 제작했습니다!
+          </p>
+          <ul class="tut-list">
+            <li>🌌 <strong>전준우 은하계 배경:</strong> 우주 배경에 빛나는 <code>CAPTAIN JUNWOO</code> 홀로그램과 별자리 효과가 펼쳐집니다.</li>
+            <li>🎵 <strong>8비트 레트로 사운드 & 음성 응원:</strong> 출격 팡파르, 준우 전용 신나는 BGM, 그리고 우주 사령부의 한국어 음성 응원이 함께합니다.</li>
+            <li>🌟 <strong>준우 영웅 모드:</strong> 기본 5개의 잔기와 스테이지당 1회 <strong>'⚡준우포(스타버스트 필살기)'</strong>를 사용할 수 있습니다!</li>
+          </ul>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="tutorial-slide" data-slide="1">
+          <div class="tut-badge">STEP 2 / 5</div>
+          <h3>🛸 트랙터 빔 구출 & 합체 (듀얼 파이터!)</h3>
+          <p>
+            갤러그 최고의 재미는 바로 <strong>기체 2대 합체(Dual Fighter)</strong>입니다!
+          </p>
+          <ul class="tut-list">
+            <li>1️⃣ 초록색 <strong>보스 갤러그</strong>(한 번 맞으면 파란색)가 아래로 내려와 푸른색 <strong>트랙터 빔</strong>을 쏩니다.</li>
+            <li>2️⃣ 일부러 빔에 잡히거나, 혹은 버튼을 눌러 <strong>즉시 합체 보너스</strong>를 노릴 수 있습니다.</li>
+            <li>3️⃣ 기체가 포획된 상태에서 다음 기체로 그 보스를 격추하면, 포획된 기체가 구출되어 <strong>2대 합체(2연사 파워업!)</strong>가 됩니다!</li>
+          </ul>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="tutorial-slide" data-slide="2">
+          <div class="tut-badge">STEP 3 / 5</div>
+          <h3>🎯 챌린징 스테이지 (보너스 스테이지)</h3>
+          <p>
+            3스테이지마다(STAGE 3, 6, 9...) 적들이 공격하지 않고 화려한 편대 비행을 펼치는 <strong>CHALLENGING STAGE</strong>가 시작됩니다!
+          </p>
+          <ul class="tut-list">
+            <li>🐝 총 40기의 적기가 5개 편대로 나뉘어 날아옵니다.</li>
+            <li>💰 8기 편대를 모두 맞추면 <strong>1,000 ~ 3,000점</strong> 추가 보너스!</li>
+            <li>🏆 40기를 전부 격추하면 <strong>PERFECT 10,000점</strong> 대박 보너스와 사령부의 특별 축하 팡파르가 울립니다!</li>
+          </ul>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="tutorial-slide" data-slide="3">
+          <div class="tut-badge">STEP 4 / 5</div>
+          <h3>📱 아이폰 · 아이패드 · PC 조작법 & 앱 설치</h3>
+          <ul class="tut-list">
+            <li>💻 <strong>PC 키보드:</strong> 좌우 방향키(<code>←</code>, <code>→</code>) 또는 <code>A</code>, <code>D</code>로 이동, <code>Space</code> 미사일 발사, <code>X</code> 준우포 필살기</li>
+            <li>📱 <strong>아이폰/아이패드 터치:</strong> 하단 <code>◀</code> <code>▶</code> 버튼을 누르거나 중앙 드래그 패드를 좌우로 밀어 부드럽게 이동할 수 있습니다. <strong>자동연사 ON</strong>을 켜두면 이동에만 집중할 수 있어 더욱 편합니다!</li>
+            <li>📲 <strong>홈 화면에 추가(PWA):</strong> 사파리(Safari) 공유 버튼 → <strong>'홈 화면에 추가'</strong>를 누르면 진짜 게임 앱처럼 전체 화면으로 즐길 수 있습니다.</li>
+          </ul>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="tutorial-slide" data-slide="4">
+          <div class="tut-badge">STEP 5 / 5</div>
+          <h3>☁️ 24시간 실시간 랭킹 & 클라우드 DB 동기화</h3>
+          <ul class="tut-list">
+            <li>🏆 준우가 아이폰, 아이패드, PC 어디서 플레이하든 <strong>명예의 전당(HIGH SCORE)</strong>과 <strong>파일럿 훈장</strong>이 실시간으로 자동 동기화됩니다.</li>
+            <li>🔗 상단 <strong>'클라우드 동기화'</strong> 버튼에서 카카오톡 전달용 자동 연결 링크를 복사하거나, 내 <strong>구글 드라이브(Google Drive)</strong>로도 기록을 백업할 수 있습니다.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tutorial-footer">
+        <label class="dont-show-again">
+          <input type="checkbox" id="chkHideTutorialAuto" />
+          <span>다음부터 자동으로 열지 않기 (상단 '❓ 사용법'으로 언제든 다시 보기 가능)</span>
+        </label>
+
+        <div class="tut-nav-row">
+          <div id="tutDots" class="tut-dots">
+            <span class="tut-dot active" data-step="0"></span>
+            <span class="tut-dot" data-step="1"></span>
+            <span class="tut-dot" data-step="2"></span>
+            <span class="tut-dot" data-step="3"></span>
+            <span class="tut-dot" data-step="4"></span>
+          </div>
+          <div class="tut-btns">
+            <button id="btnTutPrev" class="btn-secondary">← 이전</button>
+            <button id="btnTutNext" class="btn-primary">다음 단계 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 클라우드 & 구글 드라이브 DB 동기화 모달 ==================== -->
+  <div id="syncModal" class="modal-backdrop">
+    <div class="modal-box sync-box">
+      <div class="modal-header">
+        <h2>☁️ 24시간 클라우드 랭킹 & 구글 드라이브 동기화</h2>
+        <button id="btnCloseSyncModal" class="close-btn">&times;</button>
+      </div>
+
+      <div class="sync-body">
+        <div class="sync-section highlight-box">
+          <h3>🚀 1. 원클릭 24시간 클라우드 동기화 (GitHub db-store)</h3>
+          <p id="ghSyncStatusDesc" class="sync-desc">
+            컴퓨터를 꺼놓아도 아이폰·아이패드·PC의 명예의 전당 점수와 업적이 24시간 자동 동기화됩니다.
+          </p>
+          <div id="qrContainer" class="qr-container" style="display:none;">
+            <img id="qrImage" alt="동기화 QR 코드" width="140" height="140" />
+            <p>📱 아이폰/아이패드 카메라로 스캔하면 즉시 연결됩니다!</p>
+          </div>
+          <div class="sync-input-row">
+            <input type="password" id="ghTokenInput" placeholder="GitHub 동기화 토큰 (자동 연결 링크 접속 시 자동 입력됨)" />
+            <button id="btnSaveGhToken" class="btn-primary">연결 저장</button>
+          </div>
+          <div class="sync-btn-row">
+            <button id="btnCopyGhShareLink" class="btn-accent">💬 카카오톡 전달용 원클릭 자동연결 링크 복사</button>
+          </div>
+        </div>
+
+        <div class="sync-section">
+          <h3>📂 2. 내 구글 드라이브(Google Drive) DB 연동 (선택)</h3>
+          <p class="sync-desc">
+            내 구글 드라이브에 직접 <code>junwoo_galaga_db.json</code> 파일을 생성하여 점수와 기록을 관리할 수도 있습니다.
+          </p>
+          <div class="sync-input-row">
+            <input type="url" id="gdriveUrlInput" placeholder="Google Apps Script 웹 앱 URL (https://script.google.com/macros/s/.../exec)" />
+            <button id="btnSaveGdriveUrl" class="btn-primary">드라이브 연결</button>
+          </div>
+          <div class="sync-btn-row">
+            <button id="btnCopyGdriveScript" class="btn-secondary">📋 구글 드라이브 연동 스크립트 코드 복사</button>
+            <button id="btnForcePullCloud" class="btn-secondary">⬇️ 클라우드에서 불러오기</button>
+            <button id="btnForcePushCloud" class="btn-secondary">⬆️ 클라우드로 즉시 저장</button>
+          </div>
+        </div>
+
+        <div class="sync-section">
+          <h3>💾 3. 파일 백업 및 복원</h3>
+          <div class="sync-btn-row">
+            <button id="btnExportJson" class="btn-secondary">📥 랭킹·기록 JSON 다운로드</button>
+            <label class="btn-secondary file-label">
+              📤 JSON 파일 불러오기
+              <input type="file" id="inputImportJson" accept=".json" style="display:none;" />
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
