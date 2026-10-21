@@ -1,6 +1,7 @@
 import http.server
 import socketserver
 import os
+import threading
 import webbrowser
 
 PORT = 8085
@@ -13,6 +14,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
         super().end_headers()
+
+    def do_POST(self):
+        if self.path == '/api/shutdown':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(b'{"ok":true}')
+            threading.Thread(target=self.server.shutdown, daemon=True).start()
+            return
+        super().do_POST()
 
 if __name__ == '__main__':
     os.chdir(DIRECTORY)
