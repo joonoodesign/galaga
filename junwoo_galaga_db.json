@@ -1,0 +1,14 @@
+﻿{
+  "updatedAt": 1761019200000,
+  "highScore": 20000,
+  "customCheerMsg": "우주 최강 전준우 화이팅! 사랑해 아들!",
+  "bgTheme": "junwoo_galaxy",
+  "shipSkin": "junwoo_gold",
+  "pilotName": "전준우",
+  "achievements": ["first_sortie"],
+  "leaderboard": [
+    { "name": "전준우👑", "score": 20000, "stage": 5, "ratio": "68.5%", "date": "2026-10-21" },
+    { "name": "JUNWOO", "score": 15400, "stage": 4, "ratio": "62.0%", "date": "2026-10-21" },
+    { "name": "아빠응원단", "score": 12000, "stage": 3, "ratio": "55.2%", "date": "2026-10-21" }
+  ]
+}
