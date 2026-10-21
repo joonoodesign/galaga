@@ -34,6 +34,9 @@
         <span id="syncDot" class="sync-dot"></span>
         <span id="syncStatusText">클라우드 동기화</span>
       </button>
+      <button id="btnExitApp" class="hdr-btn exit-btn" title="게임 종료 및 창 닫기">
+        🛑 종료
+      </button>
     </div>
   </header>
 
@@ -48,6 +51,7 @@
         <button id="btnToggleVoice" class="chip-btn active" title="사령부 전준우 음성 응원 켜기/끄기">🎙️ 준우 음성응원 ON</button>
         <button id="btnToggleAutoFire" class="chip-btn active" title="자동 연사 켜기/끄기">🔥 자동연사 ON</button>
         <button id="btnPauseGame" class="chip-btn" title="일시정지 (P)">⏸️ 일시정지</button>
+        <button id="btnStopGame" class="chip-btn danger-chip" title="현재 게임 종료 및 대기화면 이동 (ESC)">⏹️ 게임종료</button>
       </div>
 
       <!-- 아케이드 전광판 (1UP / HIGH SCORE / STAGE) -->
@@ -136,9 +140,14 @@
               <button type="button" class="diff-btn" data-diff="normal">🕹️ 오리지널 아케이드 (목숨 3개)</button>
             </div>
 
-            <button id="btnStartGame" class="start-game-btn">
-              🚀 전준우 함대 출격 시작! (START)
-            </button>
+            <div class="overlay-btn-group">
+              <button id="btnStartGame" class="start-game-btn">
+                🚀 전준우 함대 출격 시작! (START)
+              </button>
+              <button id="btnCloseWindow" class="close-game-btn" type="button">
+                🚪 게임 완전히 끝내기 (창 닫기)
+              </button>
+            </div>
           </div>
         </div>
       </div>

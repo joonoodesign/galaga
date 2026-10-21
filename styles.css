@@ -124,6 +124,19 @@ body {
   box-shadow: 0 0 12px rgba(255, 200, 55, 0.45);
 }
 
+.exit-btn {
+  background: rgba(255, 8, 68, 0.22);
+  border-color: rgba(255, 8, 68, 0.65);
+  color: #ff99ac;
+}
+
+.exit-btn:hover {
+  background: #ff0844;
+  color: #fff;
+  border-color: #ff0844;
+  box-shadow: 0 0 14px rgba(255, 8, 68, 0.6);
+}
+
 .sync-dot {
   width: 8px;
   height: 8px;
@@ -191,6 +204,17 @@ body {
   border-color: var(--primary);
   color: #fff;
   box-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
+}
+
+.chip-btn.danger-chip {
+  background: rgba(255, 8, 68, 0.18);
+  border-color: rgba(255, 8, 68, 0.55);
+  color: #ff99ac;
+}
+
+.chip-btn.danger-chip:hover {
+  background: #ff0844;
+  color: #fff;
 }
 
 /* 전광판 */
@@ -489,6 +513,12 @@ body {
   color: var(--accent-gold);
 }
 
+.overlay-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .start-game-btn {
   width: 100%;
   background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #ff0844 100%);
@@ -501,6 +531,24 @@ body {
   cursor: pointer;
   box-shadow: 0 6px 20px rgba(0, 242, 254, 0.45);
   transition: transform 0.15s;
+}
+
+.close-game-btn {
+  width: 100%;
+  background: rgba(255, 8, 68, 0.16);
+  border: 1px solid rgba(255, 8, 68, 0.55);
+  color: #ffb3c1;
+  font-size: 0.86rem;
+  font-weight: 800;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.close-game-btn:hover {
+  background: #ff0844;
+  color: #fff;
 }
 
 .start-game-btn:hover {

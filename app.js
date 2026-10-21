@@ -1575,6 +1575,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // 현재 게임 중단 및 대기화면 복귀 (점수 자동 기록)
+  const stopCurrentGameToMenu = () => {
+    if (gameState === 'PLAYING' || gameState === 'STAGE_INTRO' || gameState === 'PAUSED') {
+      btnPause.textContent = '⏸️ 일시정지';
+      triggerGameOver();
+    } else {
+      sound.stopBgm();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      document.getElementById('gameOverlay').classList.remove('hidden');
+      showCheerBanner('🏠 대기 화면으로 돌아왔습니다.');
+    }
+  };
+
+  // 앱 완전 종료 / 창 닫기
+  const exitApplication = () => {
+    if (gameState === 'PLAYING' || gameState === 'STAGE_INTRO' || gameState === 'PAUSED') {
+      triggerGameOver();
+    }
+    sound.stopBgm();
+    sound.speakCheer('전준우 함장님, 오늘도 멋진 우주 비행이었습니다! 다음에 또 만나요!');
+    setTimeout(() => {
+      window.close();
+      // 브라우저 보안 정책으로 탭이 바로 안 닫힐 경우 종료 완료 화면 표시
+      document.getElementById('overlayTitle').textContent = 'SEE YOU AGAIN, JUNWOO!';
+      document.getElementById('overlaySubtitle').innerHTML =
+        `<strong>전준우 함장님</strong>, 모든 전투 기록이 안전하게 저장되었습니다!<br/>언제든 아래 버튼을 눌러 다시 출격하거나 브라우저 탭을 닫으실 수 있습니다.`;
+      document.getElementById('gameOverlay').classList.remove('hidden');
+    }, 300);
+  };
+
+  const btnStopGame = document.getElementById('btnStopGame');
+  if (btnStopGame) btnStopGame.addEventListener('click', stopCurrentGameToMenu);
+
+  const btnExitApp = document.getElementById('btnExitApp');
+  if (btnExitApp) btnExitApp.addEventListener('click', exitApplication);
+
+  const btnCloseWindow = document.getElementById('btnCloseWindow');
+  if (btnCloseWindow) btnCloseWindow.addEventListener('click', exitApplication);
+
   // 키보드 컨트롤
   window.addEventListener('keydown', (e) => {
     if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
@@ -1590,6 +1629,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (e.code === 'KeyP') {
       btnPause.click();
+    }
+    if (e.code === 'Escape') {
+      stopCurrentGameToMenu();
     }
   });
 
